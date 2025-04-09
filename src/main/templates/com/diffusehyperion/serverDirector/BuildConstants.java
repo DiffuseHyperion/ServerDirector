@@ -1,4 +1,4 @@
-package com.diffusehyperion.serverRedirector;
+package com.diffusehyperion.serverDirector;
 
 // The constants are replaced before compilation
 public class BuildConstants {

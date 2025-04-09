@@ -1,4 +1,4 @@
-package com.diffusehyperion.serverRedirector.database;
+package com.diffusehyperion.serverDirector.database;
 
 import javax.annotation.Nullable;
 import java.sql.Connection;
@@ -89,8 +89,5 @@ public class ServersTable {
     }
 
     public record Server(String name, String ip, int port, @Nullable String description) {
-        public String getPrefixedName() {
-            return "ServerRedirector-" + this.name;
-        }
     }
 }

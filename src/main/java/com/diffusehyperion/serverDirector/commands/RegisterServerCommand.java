@@ -1,6 +1,6 @@
-package com.diffusehyperion.serverRedirector.commands;
+package com.diffusehyperion.serverDirector.commands;
 
-import com.diffusehyperion.serverRedirector.database.ServersTable;
+import com.diffusehyperion.serverDirector.database.ServersTable;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -27,7 +27,7 @@ public class RegisterServerCommand {
                                             int port = IntegerArgumentType.getInteger(commandContext, "port");
 
                                             ServersTable.Server server = serversTable.createServer(name, ip, port, null);
-                                            proxy.registerServer(new ServerInfo(server.getPrefixedName(), new InetSocketAddress(server.ip(), server.port())));
+                                            proxy.registerServer(new ServerInfo(server.name(), new InetSocketAddress(server.ip(), server.port())));
 
                                             commandContext.getSource().sendMessage(getSuccessMessage(name, ip, port));
                                             return Command.SINGLE_SUCCESS;
@@ -40,7 +40,7 @@ public class RegisterServerCommand {
                                                     String description = StringArgumentType.getString(commandContext, "description");
 
                                                     ServersTable.Server server = serversTable.createServer(name, ip, port, description);
-                                                    proxy.registerServer(new ServerInfo(server.getPrefixedName(), new InetSocketAddress(server.ip(), server.port())));
+                                                    proxy.registerServer(new ServerInfo(server.name(), new InetSocketAddress(server.ip(), server.port())));
 
                                                     commandContext.getSource().sendMessage(getSuccessMessage(name, ip, port));
                                                     return Command.SINGLE_SUCCESS;
@@ -52,11 +52,11 @@ public class RegisterServerCommand {
     private static Component getSuccessMessage(String name, String ip, int port) {
         return
                 Component.text("Successfully registered server \"").color(NamedTextColor.GREEN)
-                        .append(Component.text(name, NamedTextColor.GOLD))
+                        .append(Component.text(name).color(NamedTextColor.GOLD))
                         .append(Component.text("\" at ").color(NamedTextColor.GREEN))
-                        .append(Component.text(ip, NamedTextColor.GOLD))
+                        .append(Component.text(ip).color(NamedTextColor.GOLD))
                         .append(Component.text(":").color(NamedTextColor.GREEN))
-                        .append(Component.text(port, NamedTextColor.GOLD));
+                        .append(Component.text(port).color(NamedTextColor.GOLD));
 
     }
 }

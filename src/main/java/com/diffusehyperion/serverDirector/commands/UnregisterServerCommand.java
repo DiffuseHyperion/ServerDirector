@@ -1,6 +1,6 @@
-package com.diffusehyperion.serverRedirector.commands;
+package com.diffusehyperion.serverDirector.commands;
 
-import com.diffusehyperion.serverRedirector.database.ServersTable;
+import com.diffusehyperion.serverDirector.database.ServersTable;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -35,7 +35,7 @@ public class UnregisterServerCommand {
                             }
 
                             serversTable.deleteServer(name);
-                            proxy.unregisterServer(new ServerInfo(server.getPrefixedName(), new InetSocketAddress(server.ip(), server.port())));
+                            proxy.unregisterServer(new ServerInfo(server.name(), new InetSocketAddress(server.ip(), server.port())));
 
                             commandContext.getSource().sendMessage(getSuccessMessage(name));
                             return Command.SINGLE_SUCCESS;
@@ -45,7 +45,7 @@ public class UnregisterServerCommand {
     private static Component getSuccessMessage(String name) {
         return
                 Component.text("Successfully unregistered server \"").color(NamedTextColor.GREEN)
-                        .append(Component.text(name, NamedTextColor.GOLD))
+                        .append(Component.text(name).color(NamedTextColor.GOLD))
                         .append(Component.text("\"").color(NamedTextColor.GREEN));
 
     }
@@ -53,7 +53,7 @@ public class UnregisterServerCommand {
     private static Component getNotFoundMessage(String name) {
         return
                 Component.text("There was no server called \"").color(NamedTextColor.RED)
-                        .append(Component.text(name, NamedTextColor.GOLD))
+                        .append(Component.text(name).color(NamedTextColor.GOLD))
                         .append(Component.text("\"").color(NamedTextColor.RED));
 
     }

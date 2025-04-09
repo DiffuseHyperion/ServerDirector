@@ -1,18 +1,17 @@
-package com.diffusehyperion.serverRedirector;
+package com.diffusehyperion.serverDirector;
 
-import com.diffusehyperion.serverRedirector.commands.RegisterServerCommand;
-import com.diffusehyperion.serverRedirector.commands.UnregisterServerCommand;
-import com.diffusehyperion.serverRedirector.database.ServersTable;
-import com.diffusehyperion.serverRedirector.events.PlayerJoinEvent;
+import com.diffusehyperion.serverDirector.commands.RegisterServerCommand;
+import com.diffusehyperion.serverDirector.commands.UnregisterServerCommand;
+import com.diffusehyperion.serverDirector.database.ServersTable;
+import com.diffusehyperion.serverDirector.events.PlayerEvents;
 import com.google.inject.Inject;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.velocitypowered.api.command.BrigadierCommand;
 import com.velocitypowered.api.command.CommandManager;
 import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.command.CommandSource;
-import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
@@ -29,8 +28,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
 
-@Plugin(id = "serverredirector", name = "ServerRedirector", version = BuildConstants.VERSION)
-public class ServerRedirector {
+@Plugin(id = "serverdirector", name = "ServerDirector", version = BuildConstants.VERSION)
+public class ServerDirector {
 
     @Inject
     private Logger logger;
@@ -38,7 +37,8 @@ public class ServerRedirector {
     @Inject
     private ProxyServer proxy;
 
-    @Inject @DataDirectory
+    @Inject
+    @DataDirectory
     private Path dataDirectory;
 
     private Connection connection;
@@ -61,18 +61,18 @@ public class ServerRedirector {
         List<ServersTable.Server> serverList = this.serversTable.readServers();
 
         for (ServersTable.Server server : serverList) {
-            this.proxy.registerServer(new ServerInfo(server.getPrefixedName(), new InetSocketAddress(server.ip(), server.port())));
+            this.proxy.registerServer(new ServerInfo(server.name(), new InetSocketAddress(server.ip(), server.port())));
         }
         return serverList.size();
     }
 
     private void registerCommands() {
         CommandManager commandManager = this.proxy.getCommandManager();
-        CommandMeta commandMeta = commandManager.metaBuilder("serverredirector")
+        CommandMeta commandMeta = commandManager.metaBuilder("serverdirector")
                 .plugin(this)
                 .build();
 
-        LiteralArgumentBuilder<CommandSource> baseCommandNode = BrigadierCommand.literalArgumentBuilder("serverredirector");
+        LiteralArgumentBuilder<CommandSource> baseCommandNode = BrigadierCommand.literalArgumentBuilder("serverdirector");
         baseCommandNode.then(RegisterServerCommand.createRegisterServerNode(this.serversTable, this.proxy, this.logger));
         baseCommandNode.then(UnregisterServerCommand.createUnregisterServerNode(this.serversTable, this.proxy, this.logger));
 
@@ -81,7 +81,7 @@ public class ServerRedirector {
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
-        this.logger.info("Initializing ServerRedirector");
+        this.logger.info("Initializing ServerDirector");
 
         this.logger.info("Initializing database");
         this.connection = getDatabaseConnection();
@@ -98,7 +98,7 @@ public class ServerRedirector {
         registerCommands();
 
         this.logger.info("Registering events");
-        this.proxy.getEventManager().register(this, new PlayerJoinEvent(this.proxy, this.serversTable));
+        this.proxy.getEventManager().register(this, new PlayerEvents(this.proxy, this.serversTable));
     }
 
     @Subscribe
