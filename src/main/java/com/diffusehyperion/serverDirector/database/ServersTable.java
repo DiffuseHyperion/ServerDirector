@@ -78,6 +78,20 @@ public class ServersTable {
         }
     }
 
+    public Server updateServer(String name, String ip, int port, @Nullable String description) {
+        try {
+            PreparedStatement statement = connection.prepareStatement("UPDATE servers SET ip = ?, port = ?, description = ? WHERE name = ?");
+            statement.setString(1, ip);
+            statement.setInt(2, port);
+            statement.setString(3, description);
+            statement.setString(4, name);
+            statement.executeUpdate();
+            return new Server(name, ip, port, description);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public boolean deleteServer(String name) {
         try {
             PreparedStatement statement = connection.prepareStatement("DELETE FROM servers WHERE name = ?");

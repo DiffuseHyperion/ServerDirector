@@ -26,6 +26,14 @@ public class RegisterServerCommand {
                                             String ip = StringArgumentType.getString(commandContext, "ip");
                                             int port = IntegerArgumentType.getInteger(commandContext, "port");
 
+                                            for (ServersTable.Server server : serversTable.readServers()) {
+                                                if (server.name().equals(name)) {
+                                                    serversTable.updateServer(name, ip, port, null);
+                                                    commandContext.getSource().sendMessage(getUpdatedMessage(name));
+                                                    return Command.SINGLE_SUCCESS;
+                                                }
+                                            }
+
                                             ServersTable.Server server = serversTable.createServer(name, ip, port, null);
                                             proxy.registerServer(new ServerInfo(server.name(), new InetSocketAddress(server.ip(), server.port())));
 
@@ -38,6 +46,14 @@ public class RegisterServerCommand {
                                                     String ip = StringArgumentType.getString(commandContext, "ip");
                                                     int port = IntegerArgumentType.getInteger(commandContext, "port");
                                                     String description = StringArgumentType.getString(commandContext, "description");
+
+                                                    for (ServersTable.Server server : serversTable.readServers()) {
+                                                        if (server.name().equals(name)) {
+                                                            serversTable.updateServer(name, ip, port, description);
+                                                            commandContext.getSource().sendMessage(getUpdatedMessage(name));
+                                                            return Command.SINGLE_SUCCESS;
+                                                        }
+                                                    }
 
                                                     ServersTable.Server server = serversTable.createServer(name, ip, port, description);
                                                     proxy.registerServer(new ServerInfo(server.name(), new InetSocketAddress(server.ip(), server.port())));
@@ -57,6 +73,14 @@ public class RegisterServerCommand {
                         .append(Component.text(ip).color(NamedTextColor.GOLD))
                         .append(Component.text(":").color(NamedTextColor.GREEN))
                         .append(Component.text(port).color(NamedTextColor.GOLD));
+
+    }
+
+    private static Component getUpdatedMessage(String name) {
+        return
+                Component.text("Successfully updated server \"").color(NamedTextColor.GREEN)
+                        .append(Component.text(name).color(NamedTextColor.GOLD))
+                        .append(Component.text("\"").color(NamedTextColor.GREEN));
 
     }
 }

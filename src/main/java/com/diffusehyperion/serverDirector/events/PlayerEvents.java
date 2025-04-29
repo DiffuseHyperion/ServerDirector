@@ -70,7 +70,7 @@ public class PlayerEvents {
 
         Component result = Component.empty();
         for (ServersTable.Server server : servers) {
-            String display = (Objects.isNull(server.description()) ? server.name() : server.name() + " - " + server.description());
+            String display = (Objects.isNull(server.description()) ? server.name() : server.description());
             result = result.append(Component.text(display)
                     .color(NamedTextColor.AQUA)
                     .decorate(TextDecoration.UNDERLINED)
